@@ -1,0 +1,370 @@
+<title>TicketZero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="TicketZero: a support-agent kit for SideShift. Triage, payout diagnosis, webhook debugging and evals, by Keshvi Pipwala.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a support console. Queue rail on the left, workbench on the right; tabs switch tools. */
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --sunk: #e9edeb;
+  --ink: #15201d;
+  --muted: #5a6964;
+  --line: #d3dbd8;
+  --accent: #0b6b5d;
+  --accent-ink: #ffffff;
+  --accent-soft: #d8ece7;
+  --ok: #1d7a3e;
+  --ok-soft: #dcf1e2;
+  --warn: #9a5b00;
+  --warn-soft: #fbecd2;
+  --bad: #b3261e;
+  --bad-soft: #f9dedb;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1412; --surface: #141d1a; --sunk: #0a100e; --ink: #e4ece9; --muted: #93a49e; --line: #26332f;
+    --accent: #4fc4ad; --accent-ink: #062520; --accent-soft: #143a33;
+    --ok: #6bd690; --ok-soft: #12301d; --warn: #f0b356; --warn-soft: #36270f; --bad: #ff8a80; --bad-soft: #3a1714;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1412; --surface: #141d1a; --sunk: #0a100e; --ink: #e4ece9; --muted: #93a49e; --line: #26332f;
+  --accent: #4fc4ad; --accent-ink: #062520; --accent-soft: #143a33;
+  --ok: #6bd690; --ok-soft: #12301d; --warn: #f0b356; --warn-soft: #36270f; --bad: #ff8a80; --bad-soft: #3a1714;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+h1, h2, h3, h4 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+code, pre, .mono { font-family: var(--mono); font-size: 0.86em; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+/* header */
+.top { display: grid; gap: 14px; grid-template-columns: 1fr auto; align-items: end; }
+.mark { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.mark h1 { font-size: clamp(34px, 5vw, 52px); font-weight: 750; line-height: 1; }
+.mark h1 span { color: var(--accent); }
+.byline { font-size: 14px; color: var(--muted); }
+.byline a { font-weight: 700; text-decoration: none; }
+.byline a:hover { text-decoration: underline; }
+.lede { max-width: 68ch; font-size: 17px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 28px; padding-block: 12px; border-block: 1px solid var(--line); }
+.stat { display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.stat b { font: 750 26px/1 var(--display); }
+.stat span { color: var(--muted); font-size: 13px; }
+.stat.good b { color: var(--ok); }
+.disclaimer { font-size: 13px; color: var(--muted); max-width: 80ch; }
+
+/* tabs */
+[role=tablist] { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+[role=tab] { appearance: none; border: 0; background: none; color: var(--muted); font: 700 14px var(--body); padding: 10px 14px; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; }
+[role=tab][aria-selected=true] { color: var(--ink); border-bottom-color: var(--accent); }
+[role=tab]:hover { color: var(--ink); }
+
+/* desk */
+.desk { display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.rail { display: grid; gap: 10px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.rail-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rail-head h2 { font-size: 18px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 13px var(--body); padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+.chip[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#ticket-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 68vh; overflow-y: auto; padding-right: 2px; }
+.ticket { width: 100%; text-align: left; display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); font: 14px/1.4 var(--body); cursor: pointer; }
+.ticket:hover { border-color: var(--accent); }
+.ticket.is-active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.ticket-meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
+.who { font-weight: 700; color: var(--ink); }
+.tid { margin-left: auto; font-family: var(--mono); font-size: 11px; }
+.side { padding: 0 6px; border-radius: 4px; background: var(--sunk); }
+.ticket-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.rail-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
+
+.bench { display: grid; gap: 16px; min-width: 0; }
+.composer { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
+label { font-weight: 700; font-size: 13px; }
+textarea, input[type=text] { width: 100%; font: 14px/1.5 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; resize: vertical; }
+textarea.code, input.code { font-family: var(--mono); font-size: 12.5px; }
+details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+details[open] summary { margin-bottom: 8px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn { appearance: none; border: 0; background: var(--accent); color: var(--accent-ink); font: 700 14px var(--body); padding: 9px 16px; border-radius: 8px; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.btn-quiet { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 13px var(--body); padding: 5px 10px; border-radius: 7px; cursor: pointer; }
+.btn-quiet:hover { border-color: var(--accent); }
+.err { color: var(--bad); font-size: 13px; }
+.hint { font-size: 12px; color: var(--muted); }
+
+#output { display: grid; gap: 12px; }
+.verdict { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 16px; border-radius: var(--r); border: 1px solid; }
+.verdict.is-auto { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.verdict.is-human { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+.verdict-title { font: 750 21px/1.2 var(--display); }
+.is-auto .verdict-title { color: var(--ok); }
+.is-human .verdict-title { color: var(--warn); }
+.prio { font: 700 11px var(--body); text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 4px; vertical-align: middle; background: var(--surface); color: var(--ink); }
+.prio-urgent { background: var(--bad); color: var(--surface); }
+.conf { display: grid; justify-items: end; gap: 3px; min-width: 120px; }
+.conf-num { font: 750 20px var(--display); font-variant-numeric: tabular-nums; }
+.conf-bar { position: relative; width: 120px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+.conf-bar span { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--ink); }
+.conf-bar i { position: absolute; top: -3px; width: 2px; height: 12px; background: var(--muted); }
+.conf-lbl { font-size: 11px; color: var(--muted); }
+.guard { font-size: 13px; padding: 8px 12px; border-radius: 8px; background: var(--sunk); }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.block h3 { font-size: 15px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rc { font-weight: 400; font-size: 12px; padding: 1px 6px; border-radius: 4px; background: var(--sunk); color: var(--muted); }
+.trace { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; counter-reset: s; }
+.trace li { display: grid; grid-template-columns: minmax(150px, max-content) minmax(0, 1fr); gap: 10px; font-size: 13.5px; align-items: baseline; }
+.trace code { color: var(--accent); }
+.reply-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.reply pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 15px/1.6 var(--body); background: var(--bg); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--line); }
+.note { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.fix { border-style: dashed; border-color: var(--accent); background: var(--accent-soft); }
+.sources { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+/* webhooks */
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.card h2 { font-size: 20px; }
+.card > p { color: var(--muted); font-size: 14px; }
+.field { display: grid; gap: 4px; }
+.result { border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; font-size: 14px; }
+.result ul { margin: 0; padding-left: 18px; }
+.result.is-ok { background: var(--ok-soft); }
+.result.is-bad { background: var(--warn-soft); }
+.result-title { font-weight: 700; }
+.kv { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.kv div { background: var(--sunk); border-radius: 8px; padding: 8px 10px; }
+.kv dt { font-size: 12px; color: var(--muted); }
+.kv dd { margin: 0; font: 750 20px var(--display); font-variant-numeric: tabular-nums; }
+.kv dd.bad { color: var(--bad); }
+.findings { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.cmd { margin: 0; overflow-x: auto; background: var(--sunk); padding: 10px 12px; border-radius: 8px; font-size: 12px; }
+#logs-result { display: grid; gap: 10px; }
+#logs-result h4 { font-size: 14px; }
+
+/* evals */
+.evals { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.blind { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 14px; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-size: 12px; color: var(--muted); font-weight: 700; }
+tr.total th, tr.total td { font-weight: 700; border-bottom: 0; border-top: 2px solid var(--ink); }
+td.good { color: var(--ok); font-weight: 700; }
+td.bad { color: var(--bad); font-weight: 700; }
+#history { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+#history li { display: grid; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.hist-head { display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
+.ver { font: 750 16px var(--display); color: var(--accent); }
+.hist-bars { display: grid; gap: 6px; }
+.hist-bars > div { display: grid; grid-template-columns: 190px minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 13px; }
+.hb { height: 8px; border-radius: 4px; background: var(--sunk); position: relative; overflow: hidden; }
+.hb span { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; }
+.hb-num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.hist-note { font-size: 13px; color: var(--muted); }
+.blind h3 { font-size: 15px; margin-bottom: 8px; }
+.loop { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+
+/* patterns */
+#themes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.theme { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 8px; }
+.theme-head { display: grid; grid-template-columns: 28px 80px minmax(0, 1fr); gap: 12px; align-items: center; }
+.theme-n { font: 750 24px var(--display); font-variant-numeric: tabular-nums; }
+.theme-bar { height: 8px; background: var(--sunk); border-radius: 4px; position: relative; overflow: hidden; }
+.theme-bar span { position: absolute; inset: 0 auto 0 0; background: var(--bad); border-radius: 4px; }
+.theme h3 { font-size: 17px; }
+.theme-body { display: grid; gap: 6px; font-size: 14px; padding-left: 120px; }
+.quotes { color: var(--muted); font-style: italic; }
+.ship { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.ship li { list-style: none; background: var(--accent-soft); border-radius: var(--r); padding: 14px; display: grid; gap: 6px; font-size: 14px; }
+.ship h3 { font-size: 16px; }
+.ship ol { margin: 0; padding: 0; display: contents; }
+.section-head { display: grid; gap: 6px; }
+.gap { background: var(--surface); border: 1px solid var(--accent); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 6px; }
+.gap h3 { font-size: 17px; }
+.gap p { max-width: 80ch; font-size: 14px; }
+.section-head h2 { font-size: 24px; }
+.section-head p { color: var(--muted); max-width: 72ch; }
+.panel { display: grid; gap: 18px; }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 4px; }
+
+@media (max-width: 860px) {
+  .top { grid-template-columns: 1fr; }
+  .desk, .two, .evals, .blind { grid-template-columns: 1fr; }
+  .rail { position: static; }
+  #ticket-list { max-height: 320px; }
+  .ship { grid-template-columns: 1fr; }
+  .theme-body { padding-left: 0; }
+  .kv { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hist-bars > div { grid-template-columns: 1fr 52px; }
+  .hist-bars .hb { grid-column: 1 / -1; grid-row: 2; }
+  .trace li { grid-template-columns: 1fr; gap: 2px; }
+  .verdict { grid-template-columns: 1fr; }
+  .conf { justify-items: start; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark">
+      <h1>Ticket<span>Zero</span></h1>
+      <p class="byline">A support-agent kit for SideShift, built by <a href="https://keshvi-portfolio-ten.vercel.app/">Keshvi Pipwala</a> · <a href="https://github.com/keshvi-pipwala/ticketzero">Code</a></p>
+    </div>
+  </header>
+
+  <p class="lede">Every ticket goes through the same loop: classify it, run the account checks a support engineer would run, decide whether the agent can answer alone, and draft the reply. Every miss becomes a rule and a test, so the agent handles it next time. It never moves money, lifts a hold or deletes data on its own.</p>
+
+  <div class="stats" aria-label="Summary">
+    <div class="stat"><b id="stat-tickets">104</b><span>labeled tickets</span></div>
+    <div class="stat"><b>13</b><span>ticket types</span></div>
+    <div class="stat"><b id="stat-auto">52</b><span>answered by the agent alone</span></div>
+    <div class="stat good"><b id="stat-unsafe">0</b><span>wrong answers sent without a person</span></div>
+    <div class="stat"><b>5</b><span>Sidekick skills</span></div>
+  </div>
+
+  <div role="tablist" aria-label="Tools">
+    <button role="tab" id="tab-desk" data-tab="desk" aria-controls="panel-desk">Ticket desk</button>
+    <button role="tab" id="tab-webhooks" data-tab="webhooks" aria-controls="panel-webhooks">Webhook debugger</button>
+    <button role="tab" id="tab-evals" data-tab="evals" aria-controls="panel-evals">Evals</button>
+    <button role="tab" id="tab-patterns" data-tab="patterns" aria-controls="panel-patterns">Complaints to fixes</button>
+  </div>
+
+  <section id="panel-desk" role="tabpanel" aria-labelledby="tab-desk" class="desk">
+    <aside class="rail">
+      <div class="rail-head">
+        <h2>Queue</h2>
+        <div class="chips" role="group" aria-label="Filter by customer">
+          <button class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" data-filter="creator" aria-pressed="false">Creators</button>
+          <button class="chip" data-filter="brand" aria-pressed="false">Brands</button>
+          <button class="chip" data-filter="integrator" aria-pressed="false">Developers</button>
+        </div>
+      </div>
+      <ul id="ticket-list"></ul>
+      <div class="rail-foot"><span id="list-count"></span><button class="btn-quiet" id="toggle-all">Show all</button></div>
+    </aside>
+
+    <div class="bench" id="workbench">
+      <div class="composer">
+        <label for="ticket-text">Ticket</label>
+        <textarea id="ticket-text" rows="3"></textarea>
+        <details>
+          <summary>Account data the agent reads (simulated, editable)</summary>
+          <textarea id="state-json" class="code" rows="10" spellcheck="false"></textarea>
+          <p class="err" id="state-error" hidden></p>
+        </details>
+        <div class="row"><button class="btn" id="run">Run the agent</button><span class="hint">Edit the ticket or the account data and run it again. Ctrl/⌘ + Enter works too.</span></div>
+      </div>
+      <div id="output" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="panel-webhooks" role="tabpanel" aria-labelledby="tab-webhooks" class="panel" hidden>
+    <div class="section-head">
+      <h2>Connect webhook debugger</h2>
+      <p>For developers on SideShift Connect. It checks a signature the way SideShift signs it (HMAC-SHA256 over the timestamp, a dot and the raw body), and when it fails, re-signs the payload with each common mistake to say which one their code makes.</p>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h2>Signature check</h2>
+        <p>Load an example, or paste a real delivery and the signature your code computed.</p>
+        <div class="row">
+          <button class="btn-quiet" data-sig="ok">Correct signature</button>
+          <button class="btn-quiet" data-sig="reserialized">Re-parsed body</button>
+          <button class="btn-quiet" data-sig="prefix">Secret without whsec_</button>
+          <button class="btn-quiet" data-sig="bodyonly">Body only</button>
+        </div>
+        <div class="field"><label for="wh-secret">Signing secret</label><input id="wh-secret" type="text" class="code" spellcheck="false"></div>
+        <div class="field"><label for="wh-ts">X-Sideshift-Timestamp</label><input id="wh-ts" type="text" class="code" spellcheck="false"></div>
+        <div class="field"><label for="wh-body">Raw request body</label><textarea id="wh-body" class="code" rows="8" spellcheck="false"></textarea></div>
+        <div class="field"><label for="wh-sig">Signature your code computed</label><input id="wh-sig" type="text" class="code" spellcheck="false"></div>
+        <div class="row"><button class="btn" id="wh-verify">Check signature</button></div>
+        <div id="wh-result" class="result" aria-live="polite"></div>
+      </div>
+      <div class="card">
+        <h2>Delivery log triage</h2>
+        <p>Paste the response of <code>GET /api/embed/webhook-logs</code>. It finds events that were never delivered, explains why, and writes the replay commands.</p>
+        <div class="field"><label for="logs">Delivery logs (JSON)</label><textarea id="logs" class="code" rows="12" spellcheck="false"></textarea></div>
+        <div class="row"><button class="btn" id="logs-run">Triage logs</button></div>
+        <div id="logs-result" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-evals" role="tabpanel" aria-labelledby="tab-evals" class="panel" hidden>
+    <div class="section-head">
+      <h2>How it's measured</h2>
+      <p>Each round, I froze the rules, wrote a fresh batch of tickets the agent had never seen, and scored it as-is. Then every miss became knowledge for the next version. The number that matters most is the last column: wrong answers sent without a person.</p>
+    </div>
+    <div class="evals">
+      <div class="card">
+        <h2>Current version, all tickets</h2>
+        <div class="table-wrap">
+          <table id="eval-table">
+            <thead><tr><th scope="col">Ticket set</th><th scope="col">Tickets</th><th scope="col">Right type</th><th scope="col">Right decision</th><th scope="col">Agent answered</th><th scope="col">Answers correct</th><th scope="col">Unsafe answers</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="muted small">Computed live in your browser from the same code and tickets as <code>npm run eval</code>. The tickets are synthetic, modeled on public SideShift reviews and the ticket types in SideShift's own CX job post.</p>
+      </div>
+      <div class="card">
+        <h2>Blind rounds</h2>
+        <div class="blind">
+        <ul id="history"></ul>
+        <div>
+        <h3>The loop</h3>
+        <ol class="loop">
+          <li>A ticket the agent can't classify goes to a person, never to a guess.</li>
+          <li>The person resolves it. The fix becomes a rule, a reply and a test case.</li>
+          <li>The rules are frozen and scored on tickets nobody tuned against.</li>
+          <li>The CI suite fails if any money-moving ticket would ever be auto-answered.</li>
+        </ol>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-patterns" role="tabpanel" aria-labelledby="tab-patterns" class="panel" hidden>
+    <div class="section-head">
+      <h2>Public complaints, and the product change that removes each one</h2>
+      <p>All 14 reviews on SideShift's Trustpilot page (unclaimed, all one-star, read on October 14, 2026), coded by theme. A small, skewed sample, but every theme also shows up in the Terms, the docs or app reviews. Agents answer tickets; the bigger win is deleting the reason for them.</p>
+    </div>
+    <div class="gap">
+      <h3>The help page doesn't cover what creators ask about</h3>
+      <p>The public customer-support page (read October 14, 2026) answers 9 questions. All 9 are for brands: pricing, trials, plans, ads, cancellation. None covers withdrawals, identity checks, holds, the 5-day review window or deleting an account, which are the topics creators complain about in public. The five runbooks in this kit can go up as help articles this week, and once they're in Intercom, its AI agent can answer from them.</p>
+    </div>
+    <ol id="themes"></ol>
+    <div class="section-head"><h2>What I would ship in the first 30 days</h2></div>
+    <ol class="ship">
+      <li><h3>Week 1: own the queue</h3><p>Work Intercom and Slack tickets end to end, tag every one by type and root cause, and write the first 10 runbooks from real resolutions.</p></li>
+      <li><h3>Weeks 2–3: agent resolves money questions</h3><p>Ship withdrawal status, review-window and deposit-fee answers to the agent with the guardrails above, and measure how many resolve with no human touch.</p></li>
+      <li><h3>Week 4: delete tickets</h3><p>Bring engineering the top three root causes with counts, starting with self-serve account deletion and withdrawal status in the app.</p></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Built from SideShift's public API docs, Terms of Service and public reviews. Independent project with no access to SideShift systems. Account data and tickets are simulated.</p>
+    <p>Keshvi Pipwala · keshvipipwalan@gmail.com · +1 (602) 516-3404</p>
+  </footer>
+</div>
+<script>__APP__</script>
