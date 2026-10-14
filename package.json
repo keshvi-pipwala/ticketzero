@@ -1,0 +1,20 @@
+{
+  "name": "ticketzero-sideshift",
+  "version": "1.0.0",
+  "description": "Support agent kit for SideShift: ticket triage, payout diagnosis, webhook debugging and Sidekick skills, with evals.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "eval": "node evals/run.mjs",
+    "eval:llm": "node evals/run.mjs --llm",
+    "build": "node scripts/build-demo.mjs"
+  },
+  "author": "Keshvi Pipwala",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
