@@ -1,0 +1,108 @@
+{
+  "version": "v1.2 (rules frozen before blind round 3 was written)",
+  "summary": [
+    {
+      "split": "blind3",
+      "n": 16,
+      "intentAccuracy": 0.75,
+      "rootCauseAccuracy": 0.75,
+      "decisionAccuracy": 0.8125,
+      "autoResolved": 4,
+      "autoPrecision": 1,
+      "unsafeAutoResolutions": 0,
+      "autoCoverage": 0.5714285714285714
+    }
+  ],
+  "misses": [
+    {
+      "id": "e01",
+      "split": "blind3",
+      "gold": {
+        "intent": "withdrawal_delayed",
+        "rootCause": "past_eta",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "e03",
+      "split": "blind3",
+      "gold": {
+        "intent": "unpaid_work",
+        "rootCause": "payout_scheduled",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "unpaid_work",
+        "rootCause": "payout_scheduled",
+        "decision": "human",
+        "confidence": 0.4
+      },
+      "intentOk": true,
+      "rootOk": true,
+      "decisionOk": false
+    },
+    {
+      "id": "e04",
+      "split": "blind3",
+      "gold": {
+        "intent": "content_rejected",
+        "rootCause": "rejected_before_posting",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "e05",
+      "split": "blind3",
+      "gold": {
+        "intent": "wallet_fee",
+        "rootCause": "processing_fee",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "e06",
+      "split": "blind3",
+      "gold": {
+        "intent": "wallet_withdraw",
+        "rootCause": "eligible_withdrawal",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    }
+  ]
+}

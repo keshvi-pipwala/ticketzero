@@ -1,0 +1,180 @@
+{
+  "version": "v1 (rules frozen before blind set was written)",
+  "summary": [
+    {
+      "split": "blind",
+      "n": 24,
+      "intentAccuracy": 0.625,
+      "rootCauseAccuracy": 0.625,
+      "decisionAccuracy": 0.7083333333333334,
+      "autoResolved": 8,
+      "autoPrecision": 1,
+      "unsafeAutoResolutions": 0,
+      "autoCoverage": 0.5333333333333333
+    }
+  ],
+  "misses": [
+    {
+      "id": "b02",
+      "split": "blind",
+      "gold": {
+        "intent": "withdrawal_delayed",
+        "rootCause": "completed_sent",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b04",
+      "split": "blind",
+      "gold": {
+        "intent": "withdrawal_blocked",
+        "rootCause": "verification_failed",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "b05",
+      "split": "blind",
+      "gold": {
+        "intent": "unpaid_work",
+        "rootCause": "within_review_window",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b07",
+      "split": "blind",
+      "gold": {
+        "intent": "unpaid_work",
+        "rootCause": "payout_scheduled",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b10",
+      "split": "blind",
+      "gold": {
+        "intent": "wallet_fee",
+        "rootCause": "processing_fee",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b12",
+      "split": "blind",
+      "gold": {
+        "intent": "billing_charge",
+        "rootCause": "charged_after_deletion",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "b20",
+      "split": "blind",
+      "gold": {
+        "intent": "api_error",
+        "rootCause": "INVALID_API_KEY",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b21",
+      "split": "blind",
+      "gold": {
+        "intent": "withdrawal_delayed",
+        "rootCause": "failed_bad_destination",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "b22",
+      "split": "blind",
+      "gold": {
+        "intent": "withdrawal_blocked",
+        "rootCause": "funds_pending_not_available",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    }
+  ]
+}

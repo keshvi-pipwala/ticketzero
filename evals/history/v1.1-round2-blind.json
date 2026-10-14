@@ -1,0 +1,126 @@
+{
+  "version": "v1.1 (rules frozen before blind round 2 was written)",
+  "summary": [
+    {
+      "split": "blind2",
+      "n": 16,
+      "intentAccuracy": 0.625,
+      "rootCauseAccuracy": 0.625,
+      "decisionAccuracy": 0.8125,
+      "autoResolved": 6,
+      "autoPrecision": 1,
+      "unsafeAutoResolutions": 0,
+      "autoCoverage": 0.6666666666666666
+    }
+  ],
+  "misses": [
+    {
+      "id": "c01",
+      "split": "blind2",
+      "gold": {
+        "intent": "withdrawal_delayed",
+        "rootCause": "past_eta",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "c02",
+      "split": "blind2",
+      "gold": {
+        "intent": "withdrawal_blocked",
+        "rootCause": "identity_not_verified",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "c03",
+      "split": "blind2",
+      "gold": {
+        "intent": "unpaid_work",
+        "rootCause": "payout_not_created",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "c07",
+      "split": "blind2",
+      "gold": {
+        "intent": "billing_charge",
+        "rootCause": "trial_converted",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    },
+    {
+      "id": "c08",
+      "split": "blind2",
+      "gold": {
+        "intent": "account_deletion",
+        "rootCause": "no_self_serve_deletion",
+        "decision": "human"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": true
+    },
+    {
+      "id": "c16",
+      "split": "blind2",
+      "gold": {
+        "intent": "unpaid_work",
+        "rootCause": "paid_to_wallet",
+        "decision": "auto"
+      },
+      "got": {
+        "intent": "other",
+        "rootCause": "unclassified",
+        "decision": "human",
+        "confidence": 0
+      },
+      "intentOk": false,
+      "rootOk": false,
+      "decisionOk": false
+    }
+  ]
+}
