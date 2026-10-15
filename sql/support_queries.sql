@@ -55,3 +55,17 @@ FROM support_tickets t
 WHERE t.created_at > now() - interval '8 weeks'
 GROUP BY 1, 2, 3
 ORDER BY week DESC, tickets DESC;
+
+-- 7. V3 guarantee watch: brands inside the 30-day money-back window running behind on conversions.
+--    Assumes a target_conversions value captured at onboarding. Pace = target spread evenly over 30 days.
+--    Each row is a refund that Customer Success can still prevent.
+SELECT g.brand_id,
+       now()::date - g.first_spend_at::date AS day_of_30,
+       g.spend_cents,
+       g.conversions,
+       g.target_conversions,
+       round(g.target_conversions * (now()::date - g.first_spend_at::date) / 30.0) AS on_pace_conversions
+FROM guarantee_enrollments g
+WHERE now()::date - g.first_spend_at::date BETWEEN 10 AND 30
+  AND g.conversions < 0.5 * g.target_conversions * (now()::date - g.first_spend_at::date) / 30.0
+ORDER BY day_of_30 DESC, g.spend_cents DESC;
