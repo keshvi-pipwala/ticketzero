@@ -14,8 +14,8 @@ Built from SideShift's public API docs, Terms of Service and public reviews. Ind
 | `src/webhooks.js` | Verifies `X-Sideshift-Signature` the way SideShift signs it, and when it fails, re-signs with each common mistake to name the bug. Triages `GET /api/embed/webhook-logs` and writes replay commands. |
 | `src/llm.js` | Optional second classifier on the Anthropic API. If the model and the rules disagree, the ticket goes to a person: two keys to auto-answer. |
 | `src/errors.js` | Every documented Connect error code, keyed by code and HTTP status (TRANSFER_FAILED alone has four meanings). |
-| `skills/` | Five runbooks written in Sidekick's custom-skill format (name, title, a description under 400 characters that says when not to use it, instructions under 24 KB), using SideShift MCP tool names. |
-| `sql/support_queries.sql` | Six proactive queries that find tickets before customers file them: withdrawals past their arrival date, work past the review window with no payout, deleted accounts still billed. |
+| `skills/` | Seven runbooks written in Sidekick's custom-skill format (name, title, a description under 400 characters that says when not to use it, instructions under 24 KB), using SideShift MCP tool names. |
+| `sql/support_queries.sql` | Seven proactive queries that find tickets before customers file them: withdrawals past their arrival date, work past the review window with no payout, deleted accounts still billed, and brands in the 30-day guarantee window running behind on conversions. |
 | `evals/` | 104 labeled tickets, the scorer, and the saved results of three blind rounds. |
 | `demo/` | The single-page demo: ticket desk, webhook debugger, evals and complaint-to-fix report. |
 
@@ -49,7 +49,7 @@ The tickets are synthetic. Their wording is modeled on public SideShift reviews 
 ## Run it
 
 ```bash
-npm test          # 28 tests: guardrails, timing rules, signatures, skill format, LLM adapter
+npm test          # 30 tests: guardrails, timing rules, signatures, skill format, LLM adapter
 npm run eval      # scores every ticket set and prints misses
 npm install && npm run build   # bundles the demo into index.html (GitHub Pages)
 ANTHROPIC_API_KEY=... npm run eval:llm   # rules + LLM, two keys to auto-answer
