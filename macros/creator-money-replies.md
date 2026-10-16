@@ -1,6 +1,6 @@
-# Creator money replies: five ready-to-paste macros
+# Money replies: five ready-to-paste macros
 
-The five money questions creators ask most, written for Intercom. Each one says when to use it, what to check first, the reply, and what never to say. Every reply follows SideShift's Terms and never promises money a person hasn't approved.
+The five money questions SideShift support hears most, from creators and brands, written for Intercom. Each one says when to use it, what to check first, the reply, and what never to say. Every reply follows SideShift's Terms and never promises money a person hasn't approved.
 
 Replace anything in `{curly braces}` before sending.
 
